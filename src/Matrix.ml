@@ -81,6 +81,16 @@ let orthographic left right bottom top near far = [|
   1.;
 |]
 
+let perspective fov aspect near far =
+  let f = tan (3.1415 *. 0.5 -. 0.5 *. fov) in
+  let rangeInv = 1.0 /. (near -. far) in
+  [|
+      f /. aspect; 0.; 0.; 0.;
+      0.; f; 0.; 0.;
+      0.; 0.; (near +. far) *. rangeInv; -1.;
+      0.; 0.; near *. far *. rangeInv *. 2.; 0.;
+  |]
+
 let to_string m =
   let el n = Js.Float.toString m.(n) in
   let line n = String.concat "" [(el (4 * n)); " "; (el (4 * n + 1)); " "; (el (4 * n + 2)); " "; (el (4 * n + 3));] in

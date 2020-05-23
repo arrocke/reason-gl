@@ -59,8 +59,6 @@ let () = GL.vertex_attrib_pointer gl a_color 3 GL.Constant.ubyte true 16 12
 
 let scale len n = (mod_float n len) /. len
 
-let transform x y z tx ty tz m = m |> (Matrix.translate x y z) |> (Matrix.rotateX tx) |> (Matrix.rotateY ty) |> (Matrix.rotateZ tz)
-
 let rec loop t =
   (* Js.log2 "Time: " t; *)
 
@@ -71,13 +69,19 @@ let rec loop t =
   let height = Canvas.height canvas in
   GL.viewport gl 0.0 0.0 (width) (height);
 
-  let projection = Matrix.orthographic 0. width height 0. 400. (-.400.) in
+  let aspect = width /. height in
+  let projection = Matrix.perspective 1.0 aspect 1. 2000. in
+  let transform =
+    projection |>
+    (Matrix.translate (1000. *. (scale 10000.0 t) -. 500.) 0. (-.500.)) |>
+    (Matrix.rotateX ((scale 4000.0 t) *. 6.28)) |>
+    (Matrix.rotateZ ((scale 4000.0 t) *. 6.28)) |>
+    (Matrix.translate (-.50.) (-.75.0) (-.15.))
+  in
 
   (* Load program and initialize uniforms. *)
   GL.use_program gl program;
-  let mat = projection |> (transform 300. 300. 50. (-.0.5) 0.5 1.2) in
-  (* let mat = projection |> (Matrix.translate ((2.0 *. (scale 4000.0 t)) -. 1.0) 0.0 0.0) in *)
-  GL.uniform_matrix_4fv gl u_matrix false (Matrix.to_float32array mat);
+  GL.uniform_matrix_4fv gl u_matrix false (Matrix.to_float32array transform);
 
   FModel.draw gl model;
 
