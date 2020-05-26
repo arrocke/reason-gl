@@ -71,13 +71,19 @@ let rec loop t =
 
   let aspect = width /. height in
   let projection = Matrix.perspective 1.0 aspect 1. 2000. in
+
+  let camera =
+    (Matrix.yRotation ((scale 10000. t) *. 6.28)) |>
+    (Matrix.translate 0. 0. 500.) in
+  let view = Matrix.inverse camera in
+
   let transform =
     projection |>
-    (Matrix.translate (1000. *. (scale 10000.0 t) -. 500.) 0. (-.500.)) |>
-    (Matrix.rotateX ((scale 4000.0 t) *. 6.28)) |>
-    (Matrix.rotateZ ((scale 4000.0 t) *. 6.28)) |>
-    (Matrix.translate (-.50.) (-.75.0) (-.15.))
-  in
+    (Matrix.multiply view) |>
+    (Matrix.translate 0. 0. 0.) |>
+    (Matrix.rotateX 0.2) |>
+    (Matrix.rotateZ 0.5) |>
+    (Matrix.translate (-.50.) (-.75.0) (-.15.)) in
 
   (* Load program and initialize uniforms. *)
   GL.use_program gl program;
