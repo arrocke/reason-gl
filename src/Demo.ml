@@ -1,6 +1,10 @@
 type frame_id
+type keyboard_event = {
+  key: string
+}
 
 external request_frame : (float -> unit) -> frame_id = "requestAnimationFrame" [@@bs.val]
+external add_event_listener: string -> (keyboard_event -> unit) -> unit = "addEventListener" [@@bs.val] [@@bs.scope "window"]
 
 let gl = match GL.init () with
 | Some(gl) -> gl
@@ -59,8 +63,40 @@ let () = GL.vertex_attrib_pointer gl a_color 3 GL.Constant.ubyte true 16 12
 
 let scale len n = (mod_float n len) /. len
 
-let rec loop t =
-  (* Js.log2 "Time: " t; *)
+type state = {
+  x: float;
+  z: float;
+  r: float;
+}
+
+let left_key_down = ref false
+let right_key_down = ref false
+let up_key_down = ref false
+let down_key_down = ref false
+
+let () = add_event_listener "keydown" (fun e ->
+  match e.key with
+  | "ArrowLeft" -> left_key_down := true
+  | "ArrowRight" -> right_key_down := true
+  | "ArrowUp" -> up_key_down := true
+  | "ArrowDown" -> down_key_down := true
+  | _ -> ()
+)
+
+let () = add_event_listener "keyup" (fun e ->
+  match e.key with
+  | "ArrowLeft" -> left_key_down := false
+  | "ArrowRight" -> right_key_down := false
+  | "ArrowUp" -> up_key_down := false
+  | "ArrowDown" -> down_key_down := false
+  | _ -> ()
+)
+
+let rec loop { z; x; r} t =
+  let r = if !left_key_down then r +. 0.01 else r in
+  let r = if !right_key_down then r -. 0.01 else r in
+  let (x, z) = if !up_key_down then (x -. ((sin r) *. 1.), z -. ((cos r) *. 1.)) else (x, z) in
+  let (x, z) = if !down_key_down then (x +. ((sin r) *. 1.), z +. ((cos r) *. 1.)) else (x, z) in
 
   (* Reset canvas. *)
   GL.clear_color gl 0.0 0.0 0.0 1.0;
@@ -73,8 +109,8 @@ let rec loop t =
   let projection = Matrix.perspective 1.0 aspect 1. 2000. in
 
   let camera =
-    (Matrix.yRotation ((scale 10000. t) *. 6.28)) |>
-    (Matrix.translate 0. 0. 500.) in
+    (Matrix.translation x 0. z) |>
+    (Matrix.rotateY r) in 
   let view = Matrix.inverse camera in
 
   let transform =
@@ -92,8 +128,8 @@ let rec loop t =
   FModel.draw gl model;
 
   (* Request next frame *)
-  let _ = request_frame loop in
+  let _ = request_frame (loop { x; z; r;}) in
 
   ()
 
-let id = request_frame loop
+let id = request_frame (loop { x = 0.; z = -.500.; r = 3.14 })
