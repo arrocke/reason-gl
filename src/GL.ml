@@ -94,6 +94,8 @@ external enable_vertex_attrib_array: gl -> attrib -> unit = "enableVertexAttribA
 
 external get_uniform_location: gl -> program -> string -> uniform = "getUniformLocation" [@@bs.send]
 external uniform_matrix_4fv: gl -> uniform -> bool -> Js.TypedArray2.Float32Array.t -> unit = "uniformMatrix4fv" [@@bs.send]
+external uniform_4fv: gl -> uniform -> (float * float * float * float) -> unit = "uniform4fv" [@@bs.send]
+external uniform_3fv: gl -> uniform -> (float * float * float) -> unit = "uniform3fv" [@@bs.send]
 
 external create_buffer: gl -> buffer = "createBuffer" [@@bs.send]
 external bind_buffer: gl -> Constant.t -> buffer -> unit = "bindBuffer" [@@bs.send]

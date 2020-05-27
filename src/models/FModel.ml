@@ -129,23 +129,23 @@ let vertices = [|
   0.; 150.;   0.;
 |]
 
-let colors = [|
-  200;  70; 120;
-  200;  70; 120;
-  200;  70; 120;
-   80;  70; 120;
-   80;  70; 120;
-   80;  70; 120;
-   70;  200; 210;
-   70;  200; 210;
-   210; 100; 70;
-   210; 160; 70;
-   70; 180; 210;
-   100; 70; 210;
-   76; 210; 100;
-   140; 210; 80;
-   90; 130; 210;
-   160; 160; 220;
+let normals = [|
+  0.; 0.; 1.;
+  0.; 0.; 1.;
+  0.; 0.; 1.;
+  0.; 0.; -.1.;
+  0.; 0.; -.1.;
+  0.; 0.; -.1.;
+  0.; 1.; 0.;
+  1.; 0.; 0.;
+  0.; -.1.; 0.;
+  1.; 0.; 0.;
+  0.; 1.; 0.;
+  1.; 0.; 0.;
+  0.; -.1.; 0.;
+  1.; 0.; 0.;
+  0.; -.1.; 0.;
+  -.1.; 0.; 0.;
 |]
 
 
@@ -153,16 +153,17 @@ module ArrayBuffer = Js.TypedArray2.ArrayBuffer
 module DataView = Js.TypedArray2.DataView
 
 let vertex_count =  (Array.length vertices) / 3
-let data = ArrayBuffer.make (16 * vertex_count)
+let data = ArrayBuffer.make (24 * vertex_count)
+let () = Js.log (Array.length normals)
 let view = DataView.make data
 let rec fill n = match n with
 | n when n < vertex_count ->
-  DataView.setFloat32LittleEndian view (16 * n) vertices.(3 * n);
-  DataView.setFloat32LittleEndian view (16 * n + 4) vertices.(3 * n + 1);
-  DataView.setFloat32LittleEndian view (16 * n + 8) vertices.(3 * n + 2);
-  DataView.setUint8 view (16 * n + 12) colors.(3 * (n / 6));
-  DataView.setUint8 view (16 * n + 13) colors.(3 * (n / 6) + 1);
-  DataView.setUint8 view (16 * n + 14) colors.(3 * (n / 6) + 2);
+  DataView.setFloat32LittleEndian view (24 * n) vertices.(3 * n);
+  DataView.setFloat32LittleEndian view (24 * n + 4) vertices.(3 * n + 1);
+  DataView.setFloat32LittleEndian view (24 * n + 8) vertices.(3 * n + 2);
+  DataView.setFloat32LittleEndian view (24 * n + 12) normals.(3 * (n / 6));
+  DataView.setFloat32LittleEndian view (24 * n + 16) normals.(3 * (n / 6) + 1);
+  DataView.setFloat32LittleEndian view (24 * n + 20) normals.(3 * (n / 6) + 2);
   fill (n + 1)
 | _ -> ()
 let () = fill 0

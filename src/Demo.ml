@@ -26,8 +26,8 @@ let build_program vertex_source fragment_source =
     match GL.get_shader_parameter gl shader GL.Constant.compile_status with
     | true -> shader
     | false ->
-        GL.delete_shader gl shader;
         Js.log (GL.get_shader_info_log gl shader);
+        GL.delete_shader gl shader;
         raise InvalidShader in
   let vertex_shader = build_shader GL.Constant.vertex_shader vertex_source in
   let fragment_shader = build_shader GL.Constant.fragment_shader fragment_source in
@@ -50,16 +50,18 @@ let model = FModel.create gl
 
 (* Get attribute and uniform locations. *)
 let a_position = GL.get_attrib_location gl program "a_position"
-let a_color = GL.get_attrib_location gl program "a_color"
+let a_normal = GL.get_attrib_location gl program "a_normal"
 let u_matrix = GL.get_uniform_location gl program "u_matrix"
+let u_color = GL.get_uniform_location gl program "u_color"
+let u_lightDirection = GL.get_uniform_location gl program "u_lightDirection"
 
 (* Configure position attribute. *)
 let () = GL.enable_vertex_attrib_array gl a_position
-let () = GL.vertex_attrib_pointer gl a_position 3 GL.Constant.float false 16 0
+let () = GL.vertex_attrib_pointer gl a_position 3 GL.Constant.float false 24 0
 
 (* Configure color attribute. *)
-let () = GL.enable_vertex_attrib_array gl a_color
-let () = GL.vertex_attrib_pointer gl a_color 3 GL.Constant.ubyte true 16 12
+let () = GL.enable_vertex_attrib_array gl a_normal
+let () = GL.vertex_attrib_pointer gl a_normal 3 GL.Constant.float false 24 12
 
 let scale len n = (mod_float n len) /. len
 
@@ -99,7 +101,7 @@ let rec loop { z; x; r} t =
   let (x, z) = if !down_key_down then (x +. ((sin r) *. 1.), z +. ((cos r) *. 1.)) else (x, z) in
 
   (* Reset canvas. *)
-  GL.clear_color gl 0.0 0.0 0.0 1.0;
+  GL.clear_color gl 1.0 1.0 1.0 1.0;
   GL.clear gl (GL.Constant.color_buffer_bit lor GL.Constant.depth_buffer_bit);
   let width = Canvas.width canvas in
   let height = Canvas.height canvas in
@@ -117,13 +119,15 @@ let rec loop { z; x; r} t =
     projection |>
     (Matrix.multiply view) |>
     (Matrix.translate 0. 0. 0.) |>
-    (Matrix.rotateX 0.2) |>
-    (Matrix.rotateZ 0.5) |>
+    (Matrix.rotateX ((scale 10000. t) *. 6.28)) |>
+    (Matrix.rotateY ((scale 10000. t) *. 6.28)) |>
     (Matrix.translate (-.50.) (-.75.0) (-.15.)) in
 
   (* Load program and initialize uniforms. *)
   GL.use_program gl program;
   GL.uniform_matrix_4fv gl u_matrix false (Matrix.to_float32array transform);
+  GL.uniform_4fv gl u_color (0.2, 1., 0.2, 1.);
+  GL.uniform_3fv gl u_lightDirection (Vector3.normalize (0.5, 0.7, 1.));
 
   FModel.draw gl model;
 
