@@ -34,6 +34,8 @@ let build_program vertex_source fragment_source =
   let program = GL.create_program(gl) in
   GL.attach_shader gl program vertex_shader;
   GL.attach_shader gl program fragment_shader;
+  GL.bind_attrib_location gl program 0 "a_position";
+  GL.bind_attrib_location gl program 1 "a_normal";
   GL.link_program gl program;
   match GL.get_program_parameter gl program GL.Constant.link_status with
   | true -> program
@@ -43,25 +45,12 @@ let build_program vertex_source fragment_source =
 
 let program = build_program Vertex.source Fragment.source
 
-module Float32Array = Js.TypedArray2.Float32Array
-
-
-let model = FModel.create gl
+let model = Model.load gl (FModel.create ())
 
 (* Get attribute and uniform locations. *)
-let a_position = GL.get_attrib_location gl program "a_position"
-let a_normal = GL.get_attrib_location gl program "a_normal"
 let u_matrix = GL.get_uniform_location gl program "u_matrix"
 let u_color = GL.get_uniform_location gl program "u_color"
 let u_lightDirection = GL.get_uniform_location gl program "u_lightDirection"
-
-(* Configure position attribute. *)
-let () = GL.enable_vertex_attrib_array gl a_position
-let () = GL.vertex_attrib_pointer gl a_position 3 GL.Constant.float false 24 0
-
-(* Configure color attribute. *)
-let () = GL.enable_vertex_attrib_array gl a_normal
-let () = GL.vertex_attrib_pointer gl a_normal 3 GL.Constant.float false 24 12
 
 let scale len n = (mod_float n len) /. len
 
@@ -129,7 +118,7 @@ let rec loop { z; x; r} t =
   GL.uniform_4fv gl u_color (0.2, 1., 0.2, 1.);
   GL.uniform_3fv gl u_lightDirection (Vector3.normalize (0.5, 0.7, 1.));
 
-  FModel.draw gl model;
+  Model.draw gl model;
 
   (* Request next frame *)
   let _ = request_frame (loop { x; z; r;}) in

@@ -1,8 +1,8 @@
 type gl 
 type shader
 type program
-type attrib
-type uniform
+type attrib = int
+type uniform = int
 type buffer
 
 let _gl: gl option ref = ref None
@@ -89,6 +89,7 @@ external use_program: gl -> program -> unit = "useProgram" [@@bs.send]
 external get_program_info_log: gl -> program -> string = "getProgramInfoLog" [@@bs.send]
 
 external get_attrib_location: gl -> program -> string -> attrib = "getAttribLocation" [@@bs.send]
+external bind_attrib_location: gl -> program -> int -> string -> unit = "bindAttribLocation" [@@bs.send]
 external vertex_attrib_pointer: gl -> attrib -> int -> Constant.t -> bool -> int -> int -> unit = "vertexAttribPointer" [@@bs.send]
 external enable_vertex_attrib_array: gl -> attrib -> unit = "enableVertexAttribArray" [@@bs.send]
 
@@ -100,4 +101,6 @@ external uniform_3fv: gl -> uniform -> (float * float * float) -> unit = "unifor
 external create_buffer: gl -> buffer = "createBuffer" [@@bs.send]
 external bind_buffer: gl -> Constant.t -> buffer -> unit = "bindBuffer" [@@bs.send]
 external buffer_data: gl -> Constant.t -> Js.TypedArray2.array_buffer -> Constant.t -> unit = "bufferData" [@@bs.send]
+external buffer_data_size: gl -> Constant.t -> int -> Constant.t -> unit = "bufferData" [@@bs.send]
+external buffer_sub_data: gl -> Constant.t -> int -> Js.TypedArray2.array_buffer -> unit = "bufferSubData" [@@bs.send]
 
