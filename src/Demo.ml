@@ -15,42 +15,8 @@ let canvas = GL.canvas(gl)
 let () = GL.enable gl GL.Constant.cull_face
 let () = GL.enable gl GL.Constant.depth_test
 
-exception InvalidShader
-exception InvalidProgram
-
-let build_program vertex_source fragment_source =
-  let build_shader shader_type source = 
-    let shader = GL.create_shader gl shader_type in
-    let () = GL.shader_source gl shader source in
-    let () = GL.compile_shader gl shader in
-    match GL.get_shader_parameter gl shader GL.Constant.compile_status with
-    | true -> shader
-    | false ->
-        Js.log (GL.get_shader_info_log gl shader);
-        GL.delete_shader gl shader;
-        raise InvalidShader in
-  let vertex_shader = build_shader GL.Constant.vertex_shader vertex_source in
-  let fragment_shader = build_shader GL.Constant.fragment_shader fragment_source in
-  let program = GL.create_program(gl) in
-  GL.attach_shader gl program vertex_shader;
-  GL.attach_shader gl program fragment_shader;
-  GL.bind_attrib_location gl program 0 "a_position";
-  GL.bind_attrib_location gl program 1 "a_normal";
-  GL.link_program gl program;
-  match GL.get_program_parameter gl program GL.Constant.link_status with
-  | true -> program
-  | false ->
-      GL.delete_program gl program;
-      raise InvalidProgram
-
-let program = build_program Vertex.source Fragment.source
-
+let program = ShaderProgram.create gl
 let model = Model.load gl (FModel.create ())
-
-(* Get attribute and uniform locations. *)
-let u_matrix = GL.get_uniform_location gl program "u_matrix"
-let u_color = GL.get_uniform_location gl program "u_color"
-let u_lightDirection = GL.get_uniform_location gl program "u_lightDirection"
 
 let scale len n = (mod_float n len) /. len
 
@@ -97,28 +63,25 @@ let rec loop { z; x; r} t =
   GL.viewport gl 0.0 0.0 (width) (height);
 
   let aspect = width /. height in
-  let projection = Matrix.perspective 1.0 aspect 1. 2000. in
+  let proj_mat = Matrix.perspective 1.0 aspect 1. 2000. in
 
-  let camera =
-    (Matrix.translation x 0. z) |>
-    (Matrix.rotateY r) in 
-  let view = Matrix.inverse camera in
+  let view_mat =
+    Matrix.translation x 0. z |>
+    Matrix.rotateY r |>
+    Matrix.inverse in
 
-  let transform =
-    projection |>
-    (Matrix.multiply view) |>
-    (Matrix.translate 0. 0. 0.) |>
+  let model_mat =
+    (Matrix.translation 0. 0. 0.) |>
     (Matrix.rotateX ((scale 10000. t) *. 6.28)) |>
     (Matrix.rotateY ((scale 10000. t) *. 6.28)) |>
     (Matrix.translate (-.50.) (-.75.0) (-.15.)) in
 
-  (* Load program and initialize uniforms. *)
-  GL.use_program gl program;
-  GL.uniform_matrix_4fv gl u_matrix false (Matrix.to_float32array transform);
-  GL.uniform_4fv gl u_color (0.2, 1., 0.2, 1.);
-  GL.uniform_3fv gl u_lightDirection (Vector3.normalize (0.5, 0.7, 1.));
+  let model2_mat = Matrix.multiply model_mat (Matrix.translation 200. 0. 0.) in
+  let model3_mat = Matrix.multiply model_mat (Matrix.translation 0. 100. 0.) in
 
-  Model.draw gl model;
+  ShaderProgram.draw gl program model model_mat view_mat proj_mat;
+  ShaderProgram.draw gl program model model2_mat view_mat proj_mat;
+  ShaderProgram.draw gl program model model3_mat view_mat proj_mat;
 
   (* Request next frame *)
   let _ = request_frame (loop { x; z; r;}) in

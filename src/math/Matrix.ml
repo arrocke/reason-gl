@@ -90,6 +90,9 @@ let perspective fov aspect near far =
     [| 0.; 0.; near *. far *. rangeInv *. 2.; 0.; |];
   |]
 
+let transpose mat =
+  Array.mapi (fun m _ -> Array.mapi (fun n _ -> mat.(n).(m)) mat.(m)) mat
+
 let inverse mat =
   let det m n =
     let mat2 = Array.make_matrix 3 3 0. in
