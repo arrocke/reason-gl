@@ -15,7 +15,7 @@ let canvas = GL.canvas(gl)
 let () = GL.enable gl GL.Constant.cull_face
 let () = GL.enable gl GL.Constant.depth_test
 
-let program = ShaderProgram.create gl
+let () = Renderer.init gl
 let model = Model.load gl (FModel.create ())
 
 let scale len n = (mod_float n len) /. len
@@ -79,9 +79,9 @@ let rec loop { z; x; r} t =
   let model2_mat = Matrix.multiply model_mat (Matrix.translation 200. 0. 0.) in
   let model3_mat = Matrix.multiply model_mat (Matrix.translation 0. 100. 0.) in
 
-  ShaderProgram.draw gl program model model_mat view_mat proj_mat;
-  ShaderProgram.draw gl program model model2_mat view_mat proj_mat;
-  ShaderProgram.draw gl program model model3_mat view_mat proj_mat;
+  Renderer.draw model model_mat view_mat proj_mat;
+  Renderer.draw model model2_mat view_mat proj_mat;
+  Renderer.draw model model3_mat view_mat proj_mat;
 
   (* Request next frame *)
   let _ = request_frame (loop { x; z; r;}) in
