@@ -21,8 +21,6 @@ let model = Model.load gl (FModel.create ())
 let scale len n = (mod_float n len) /. len
 
 type state = {
-  x: float;
-  z: float;
   r: float;
 }
 
@@ -49,11 +47,9 @@ let () = add_event_listener "keyup" (fun e ->
   | _ -> ()
 )
 
-let rec loop { z; x; r} t =
+let rec loop { r } t =
   let r = if !left_key_down then r +. 0.01 else r in
   let r = if !right_key_down then r -. 0.01 else r in
-  let (x, z) = if !up_key_down then (x -. ((sin r) *. 1.), z -. ((cos r) *. 1.)) else (x, z) in
-  let (x, z) = if !down_key_down then (x +. ((sin r) *. 1.), z +. ((cos r) *. 1.)) else (x, z) in
 
   (* Reset canvas. *)
   GL.clear_color gl 1.0 1.0 1.0 1.0;
@@ -66,26 +62,22 @@ let rec loop { z; x; r} t =
   let proj_mat = Matrix.perspective 1.0 aspect 1. 2000. in
 
   let view_mat =
-    Matrix.translation x 0. z |>
+    Matrix.identity |>
     Matrix.rotateY r |>
+    Matrix.translate 0. 0. (500.) |>
     Matrix.inverse in
 
   let model_mat =
     (Matrix.translation 0. 0. 0.) |>
-    (Matrix.rotateX ((scale 10000. t) *. 6.28)) |>
-    (Matrix.rotateY ((scale 10000. t) *. 6.28)) |>
+    (Matrix.rotateX ((scale 20000. t) *. 6.28)) |>
+    (Matrix.rotateY ((scale 20000. t) *. 6.28)) |>
     (Matrix.translate (-.50.) (-.75.0) (-.15.)) in
 
-  let model2_mat = Matrix.multiply model_mat (Matrix.translation 200. 0. 0.) in
-  let model3_mat = Matrix.multiply model_mat (Matrix.translation 0. 100. 0.) in
-
   Renderer.draw model model_mat view_mat proj_mat;
-  Renderer.draw model model2_mat view_mat proj_mat;
-  Renderer.draw model model3_mat view_mat proj_mat;
 
   (* Request next frame *)
-  let _ = request_frame (loop { x; z; r;}) in
+  let _ = request_frame (loop { r;}) in
 
   ()
 
-let id = request_frame (loop { x = 0.; z = -.500.; r = 3.14 })
+let id = request_frame (loop { r = 3.14 })
