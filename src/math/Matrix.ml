@@ -57,6 +57,10 @@ let multiply m1 m2 =
     [| (entry 3 0); (entry 3 1); (entry 3 2); (entry 3 3) |];
   |]
 
+let multiply_vector mat (x, y, z) = 
+  let entry m = mat.(m).(0) *. x +. mat.(m).(1) *. y +. mat.(m).(2) *. z in
+  (entry 0), (entry 1), (entry 2)
+
 let identity = [|
   [| 1.0; 0.0; 0.0; 0.0; |];
   [| 0.0; 1.0; 0.0; 0.0; |];
