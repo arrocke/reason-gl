@@ -16,6 +16,11 @@ let () = GL.enable gl GL.Constant.cull_face
 let () = GL.enable gl GL.Constant.depth_test
 
 let () = Renderer.init gl
+let () = Renderer.set_light
+  (Vector3.create 500. 500. 500.)
+  (Vector3.create 0.8 0.2 0.5)
+  (Vector3.create 0.8 0.2 0.5)
+  (Vector3.create 0.8 0.2 0.5)
 let model = Model.load gl (Sphere.create 50 100)
 
 let scale len n = (mod_float n len) /. len

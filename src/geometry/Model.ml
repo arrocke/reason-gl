@@ -10,16 +10,14 @@ type t = {
   loaded: bool;
 }
 
-let create vertices normals indices =
-  Js.log3 vertices normals indices;
-{
-  vertices;
-  normals;
-  indices;
-  data_buffer = None;
-  index_buffer = None;
-  loaded = false;
-}
+let create vertices normals indices = {
+    vertices;
+    normals;
+    indices;
+    data_buffer = None;
+    index_buffer = None;
+    loaded = false;
+  }
 
 let float_buffer_of_array arr = Float32Array.make arr |> Float32Array.buffer
 let int_buffer_of_array arr = Uint16Array.make arr |> Uint16Array.buffer

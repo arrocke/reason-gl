@@ -1,5 +1,7 @@
 type t = float * float * float
 
+let create x y z = (x, y, z)
+
 let magnitude (x, y, z) = sqrt (x *. x +. y *. y +. z *. z) 
 
 let normalize v = 

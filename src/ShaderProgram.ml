@@ -17,6 +17,8 @@ module Make = functor(Source: Source) -> struct
   | Some(renderer) -> renderer
   | None -> raise Not_found
 
+  let get_gl () = (get_renderer ()).gl
+
   exception InvalidProgram of (string * string * string)
 
   let init gl = 

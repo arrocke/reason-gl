@@ -1,4 +1,4 @@
-include ShaderProgram.Make(struct
+module Program = ShaderProgram.Make(struct
   let vertex_source = {| 
     attribute vec3 a_position;
     attribute vec3 a_normal;
@@ -56,24 +56,47 @@ include ShaderProgram.Make(struct
     bind 1 "a_normal"
 end)
 
+type light = {
+  position: Vector3.t;
+  ambient: Vector3.t;
+  diffuse: Vector3.t;
+  specular: Vector3.t;
+}
+
+let init = Program.init
+
+let light: light ref = ref {
+  position = Vector3.create 0. 0. 0.;
+  ambient = Vector3.create 1. 1. 1.;
+  diffuse = Vector3.create 1. 1. 1.;
+  specular = Vector3.create 1. 1. 1.;
+}
+
+let set_light position ambient diffuse specular =
+  light := {
+    position;
+    ambient;
+    diffuse;
+    specular;
+  }
+
 let use model_mat view_mat proj_mat =
-  use ();
+  Program.use ();
   let normal_mat = Matrix.multiply view_mat model_mat |> Matrix.inverse |> Matrix.transpose in
-  bind_uniform_mat4 "u_norm" normal_mat;
-  bind_uniform_mat4 "u_model" model_mat;
-  bind_uniform_mat4 "u_view" view_mat;
-  bind_uniform_mat4 "u_proj" proj_mat;
-  bind_uniform_3f "k_amb" (0.2, 0.05, 0.1);
-  bind_uniform_3f "k_dif" (0.8, 0.2, 0.4);
-  bind_uniform_3f "k_spec" (0.8, 0.8, 0.8);
-  bind_uniform_f "k_shine" 15.;
-  bind_uniform_3f "light_pos" (5000., 5000., 10000.);
-  bind_uniform_3f "light_amb" (1., 1., 1.);
-  bind_uniform_3f "light_dif" (1., 1., 1.);
-  bind_uniform_3f "light_spec" (1., 1., 1.)
+  Program.bind_uniform_mat4 "u_norm" normal_mat;
+  Program.bind_uniform_mat4 "u_model" model_mat;
+  Program.bind_uniform_mat4 "u_view" view_mat;
+  Program.bind_uniform_mat4 "u_proj" proj_mat;
+  Program.bind_uniform_3f "k_amb" (0.2, 0.05, 0.1);
+  Program.bind_uniform_3f "k_dif" (0.8, 0.2, 0.4);
+  Program.bind_uniform_3f "k_spec" (0.8, 0.8, 0.8);
+  Program.bind_uniform_f "k_shine" 15.;
+  Program.bind_uniform_3f "light_pos" (!light).position;
+  Program.bind_uniform_3f "light_amb" (!light).ambient;
+  Program.bind_uniform_3f "light_dif" (!light).diffuse;
+  Program.bind_uniform_3f "light_spec" (!light).specular
 
 let draw model model_mat view_mat proj_mat =
-  let { gl; } = get_renderer () in
   use model_mat view_mat proj_mat;
-  Model.draw gl model;
-  stop ();
+  Model.draw (Program.get_gl ()) model;
+  Program.stop ();
