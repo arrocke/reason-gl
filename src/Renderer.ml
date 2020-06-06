@@ -121,14 +121,14 @@ let use model_mat view_mat proj_mat =
   bind_uniform_mat4 "u_model" model_mat;
   bind_uniform_mat4 "u_view" view_mat;
   bind_uniform_mat4 "u_proj" proj_mat;
-  bind_uniform_3f "k_amb" (0.5, 0.5, 0.5);
-  bind_uniform_3f "k_dif" (0.8, 0.8, 0.8);
-  bind_uniform_3f "k_spec" (1., 1., 1.);
-  bind_uniform_3f "light_pos" (0., 0., 10000.);
-  bind_uniform_3f "light_amb" (0.1, 0.6, 0.1);
-  bind_uniform_3f "light_dif" (0.1, 0.6, 0.1);
-  bind_uniform_3f "light_spec" (0.1, 0.6, 0.1);
-  bind_uniform_f "light_shine" 1000. 
+  bind_uniform_3f "k_amb" (0.2, 0.05, 0.1);
+  bind_uniform_3f "k_dif" (0.8, 0.2, 0.4);
+  bind_uniform_3f "k_spec" (0.8, 0.8, 0.8);
+  bind_uniform_f "k_shine" 15.;
+  bind_uniform_3f "light_pos" (5000., 5000., 10000.);
+  bind_uniform_3f "light_amb" (1., 1., 1.);
+  bind_uniform_3f "light_dif" (1., 1., 1.);
+  bind_uniform_3f "light_spec" (1., 1., 1.)
 
 let stop () = ()
 

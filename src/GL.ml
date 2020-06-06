@@ -71,6 +71,7 @@ external clear_color: gl -> float -> float -> float -> float -> unit = "clearCol
 external clear: gl -> Constant.t -> unit = "clear" [@@bs.send]
 external viewport: gl -> float -> float -> float -> float -> unit = "viewport" [@@bs.send]
 external draw_arrays: gl -> Constant.t -> int -> int -> unit = "drawArrays" [@@bs.send]
+external draw_elements: gl -> Constant.t -> int -> Constant.t -> int -> unit = "drawElements" [@@bs.send]
 external enable: gl -> Constant.t -> unit = "enable" [@@bs.send]
 
 external create_shader: gl -> Constant.t -> shader = "createShader" [@@bs.send]

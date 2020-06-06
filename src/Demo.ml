@@ -16,7 +16,7 @@ let () = GL.enable gl GL.Constant.cull_face
 let () = GL.enable gl GL.Constant.depth_test
 
 let () = Renderer.init gl
-let model = Model.load gl (FModel.create ())
+let model = Model.load gl (Sphere.create 50 100)
 
 let scale len n = (mod_float n len) /. len
 
@@ -69,9 +69,7 @@ let rec loop { r } t =
 
   let model_mat =
     (Matrix.translation 0. 0. 0.) |>
-    (Matrix.rotateX ((scale 20000. t) *. 6.28)) |>
-    (Matrix.rotateY ((scale 20000. t) *. 6.28)) |>
-    (Matrix.translate (-.50.) (-.75.0) (-.15.)) in
+    (Matrix.scale 100. 100. 100.) in
 
   Renderer.draw model model_mat view_mat proj_mat;
 
