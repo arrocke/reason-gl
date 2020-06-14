@@ -18,7 +18,10 @@ let create num_v num_h =
       let h_angle = h_step *. float_of_int(j) in
       let x = xz *. (cos h_angle) in
       let z = xz *. (sin h_angle) in
-      (x::y::z::vertices, (x /. r)::(y /. r)::(z /. r)::normals)
+      (
+        x::y::z::vertices,
+        (x /. r)::(y /. r)::(z /. r)::normals
+      )
     ) acc (num_h + 1)
   ) ([], []) (num_v + 1) in
   let indices = fold_i (fun i indices -> 

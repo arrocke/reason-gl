@@ -19,9 +19,9 @@ let renderer = Renderer.init gl
 let renderer = Renderer.set_light
   renderer
   (Vector3.create 500. 500. 500.)
-  (Vector3.create 0.8 0.2 0.5)
-  (Vector3.create 0.8 0.2 0.5)
-  (Vector3.create 0.8 0.2 0.5)
+  (Vector3.create 1.0 1.0 1.0)
+  (Vector3.create 1.0 1.0 1.0)
+  (Vector3.create 1.0 1.0 1.0)
 let model = Model.load gl (Sphere.create 50 100)
 
 let scale len n = (mod_float n len) /. len

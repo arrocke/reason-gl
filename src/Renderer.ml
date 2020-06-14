@@ -1,6 +1,7 @@
 let vertex_source = {| 
   attribute vec3 a_position;
   attribute vec3 a_normal;
+  attribute vec3 a_color;
 
   uniform mat4 u_norm;
   uniform mat4 u_model;
@@ -9,11 +10,13 @@ let vertex_source = {|
 
   varying vec3 n;
   varying vec3 v;
+  varying vec3 color;
 
   void main() {
     gl_Position = u_proj * u_view * u_model * vec4(a_position, 1);
     n = normalize((u_norm * vec4(a_normal, 0)).xyz);
     v = (u_view * u_model * vec4(a_position, 1)).xyz;
+    color = a_color;
   }
 |}
 
@@ -22,6 +25,7 @@ let fragment_source = {|
 
   varying vec3 n;
   varying vec3 v;
+  varying vec3 color;
 
   uniform vec3 light_pos;
   uniform vec3 light_amb;
@@ -46,13 +50,14 @@ let fragment_source = {|
       0.0, 1.0
     );
 
-    gl_FragColor = vec4(Ia + Id + Is, 1);
+    gl_FragColor = vec4(color * (Ia + Id + Is), 1);
   }
 |}
 
 let attribs = [
   0, "a_position";
   1, "a_normal";
+  2, "a_color";
 ]
 
 type light = {
