@@ -95,7 +95,7 @@ let set_light r position ambient diffuse specular =
 
 let use { program; light } model_mat view_mat proj_mat =
   ShaderProgram.use program;
-  let normal_mat = Matrix.multiply view_mat model_mat |> Matrix.inverse |> Matrix.transpose in
+  let normal_mat = Matrix4.multiply view_mat model_mat |> Matrix4.inverse |> Matrix4.transpose in
   ShaderProgram.bind_uniform_mat4 program "u_norm" normal_mat;
   ShaderProgram.bind_uniform_mat4 program "u_model" model_mat;
   ShaderProgram.bind_uniform_mat4 program "u_view" view_mat;
@@ -104,7 +104,7 @@ let use { program; light } model_mat view_mat proj_mat =
   ShaderProgram.bind_uniform_3f program "k_dif" (0.8, 0.2, 0.4);
   ShaderProgram.bind_uniform_3f program "k_spec" (0.8, 0.8, 0.8);
   ShaderProgram.bind_uniform_f program "k_shine" 15.;
-  ShaderProgram.bind_uniform_3f program "light_pos" (Matrix.multiply_vector view_mat light.position);
+  ShaderProgram.bind_uniform_3f program "light_pos" (Matrix4.multiply_vector view_mat light.position);
   ShaderProgram.bind_uniform_3f program "light_amb" light.ambient;
   ShaderProgram.bind_uniform_3f program "light_dif" light.diffuse;
   ShaderProgram.bind_uniform_3f program "light_spec" light.specular

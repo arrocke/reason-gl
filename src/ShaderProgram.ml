@@ -43,7 +43,7 @@ let stop { gl; program; } = ()
 
 let bind_uniform_mat4 { gl; program; } name mat =
   let location = GL.get_uniform_location gl program name in
-  GL.uniform_matrix_4fv gl location false (Matrix.to_float32array mat)
+  GL.uniform_matrix_4fv gl location false (Matrix4.to_float32array mat)
 
 let bind_uniform_4f { gl; program; } name v =
   let location = GL.get_uniform_location gl program name in

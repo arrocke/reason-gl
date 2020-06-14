@@ -35,16 +35,16 @@ let rec loop _ _ =
   GL.viewport gl 0.0 0.0 (width) (height);
 
   let aspect = width /. height in
-  let proj_mat = Matrix.perspective 1.0 aspect 1. 2000. in
+  let proj_mat = Matrix4.perspective 1.0 aspect 1. 2000. in
 
   let view_mat =
-    Matrix.identity |>
-    Matrix.translate 0. 0. (500.) |>
-    Matrix.inverse in
+    Matrix4.identity |>
+    Matrix4.translate 0. 0. (500.) |>
+    Matrix4.inverse in
 
   let model_mat =
-    (Matrix.translation 0. 0. 0.) |>
-    (Matrix.scale 100. 100. 100.) in
+    (Matrix4.translation 0. 0. 0.) |>
+    (Matrix4.scale 100. 100. 100.) in
 
   Renderer.draw renderer model model_mat view_mat proj_mat;
 
