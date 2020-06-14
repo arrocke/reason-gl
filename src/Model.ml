@@ -10,14 +10,26 @@ type t = {
   loaded: bool;
 }
 
-let create vertices normals indices = {
-    vertices;
-    normals;
-    indices;
-    data_buffer = None;
-    index_buffer = None;
-    loaded = false;
-  }
+let create vertices = {
+  vertices;
+  normals = [||];
+  indices = [||];
+  data_buffer = None;
+  index_buffer = None;
+  loaded = false;
+}
+
+let set_normals normals model = {
+  model with
+  normals;
+  loaded = false;
+}
+
+let set_indicies indices model = {
+  model with
+  indices;
+  loaded = false;
+}
 
 let float_buffer_of_array arr = Float32Array.make arr |> Float32Array.buffer
 let int_buffer_of_array arr = Uint16Array.make arr |> Uint16Array.buffer
@@ -39,22 +51,34 @@ let load gl model =
   GL.enable_vertex_attrib_array gl 0;
   GL.vertex_attrib_pointer gl 0 3 GL.Constant.float false 0 verticesOffset;
 
-  GL.buffer_sub_data gl GL.Constant.array_buffer normalsOffset (float_buffer_of_array model.normals);
-  GL.enable_vertex_attrib_array gl 1;
-  GL.vertex_attrib_pointer gl 1 3 GL.Constant.float false 0 normalsOffset;
+  let () = match Array.length model.normals with
+  | 0 -> GL.disable_vertex_attrib_array gl 1 
+  | _ -> 
+    GL.buffer_sub_data gl GL.Constant.array_buffer normalsOffset (float_buffer_of_array model.normals);
+    GL.enable_vertex_attrib_array gl 1;
+    GL.vertex_attrib_pointer gl 1 3 GL.Constant.float false 0 normalsOffset in
 
-  let index_buffer = match model.data_buffer with
-  | Some(buffer) -> buffer
-  | None -> GL.create_buffer gl in
-  GL.bind_buffer gl GL.Constant.element_array_buffer index_buffer;
-  GL.buffer_data gl GL.Constant.element_array_buffer (int_buffer_of_array model.indices) GL.Constant.static_draw;
+  let index_buffer = match Array.length model.normals with
+  | 0 ->
+    GL.disable_vertex_attrib_array gl 1;
+    None
+  | _ -> 
+    let index_buffer = match model.data_buffer with
+    | Some(buffer) -> buffer
+    | None -> GL.create_buffer gl in
+    GL.bind_buffer gl GL.Constant.element_array_buffer index_buffer;
+    GL.buffer_data gl GL.Constant.element_array_buffer (int_buffer_of_array model.indices) GL.Constant.static_draw;
+    Some(index_buffer) in
 
   {
     model with
     data_buffer = Some(data_buffer);
-    index_buffer = Some(index_buffer);
+    index_buffer;
     loaded = true
   }
 
 let draw gl model =
-  GL.draw_elements gl GL.Constant.triangles (Array.length model.indices) GL.Constant.ushort 0;
+  GL.vertex_attrib_3f gl 1 0. 0. 0.;
+  match Array.length model.indices with
+  | 0 -> GL.draw_arrays gl GL.Constant.triangles 0 (Array.length model.vertices)
+  | _ -> GL.draw_elements gl GL.Constant.triangles (Array.length model.indices) GL.Constant.ushort 0

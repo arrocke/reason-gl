@@ -31,5 +31,7 @@ let create num_v num_h =
       if i != (num_v - 1) then (k1 + 1)::k2::(k2 + 1)::indices else indices
     ) indices num_h
   ) [] num_v in
-  Model.create (Array.of_list (List.rev vertices)) (Array.of_list (List.rev normals)) (Array.of_list (List.rev indices))
+  Model.create (Array.of_list (List.rev vertices)) |>
+  Model.set_normals (Array.of_list (List.rev normals)) |>
+  Model.set_indicies (Array.of_list (List.rev indices))
   

@@ -93,6 +93,8 @@ external get_attrib_location: gl -> program -> string -> attrib = "getAttribLoca
 external bind_attrib_location: gl -> program -> int -> string -> unit = "bindAttribLocation" [@@bs.send]
 external vertex_attrib_pointer: gl -> attrib -> int -> Constant.t -> bool -> int -> int -> unit = "vertexAttribPointer" [@@bs.send]
 external enable_vertex_attrib_array: gl -> attrib -> unit = "enableVertexAttribArray" [@@bs.send]
+external disable_vertex_attrib_array: gl -> attrib -> unit = "disableVertexAttribArray" [@@bs.send]
+external vertex_attrib_3f: gl -> attrib -> float -> float -> float -> unit = "vertexAttrib3f" [@@bs.send]
 
 external get_uniform_location: gl -> program -> string -> uniform = "getUniformLocation" [@@bs.send]
 external uniform_matrix_4fv: gl -> uniform -> bool -> Js.TypedArray2.Float32Array.t -> unit = "uniformMatrix4fv" [@@bs.send]
