@@ -24,6 +24,10 @@ let multiply_vector mat v =
   let entry m = mat.(m).(0) *. (Vector3.x v) +. mat.(m).(1) *. (Vector3.y v) +. mat.(m).(2) *. (Vector3.z v) in
   Vector3.create (entry 0) (entry 1) (entry 2)
 
+let multiply_point mat p = 
+  let entry m = mat.(m).(0) *. (Point3.x p) +. mat.(m).(1) *. (Point3.y p) +. mat.(m).(2) *. (Point3.z p) in
+  Point3.create (entry 0) (entry 1) (entry 2)
+
 let transpose mat =
   Array.mapi (fun m _ -> Array.mapi (fun n _ -> mat.(n).(m)) mat.(m)) mat
 

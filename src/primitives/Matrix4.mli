@@ -3,6 +3,7 @@ type t
 val identity: t
 val multiply: t -> t -> t
 val multiply_vector: t -> Vector3.t -> Vector3.t
+val multiply_point: t -> Point3.t -> Point3.t
 val transpose: t -> t
 val inverse: t -> t
 

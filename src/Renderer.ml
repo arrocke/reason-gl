@@ -60,54 +60,48 @@ let attribs = [
   2, "a_color";
 ]
 
-type light = {
-  position: Vector3.t;
-  ambient: Vector3.t;
-  diffuse: Vector3.t;
-  specular: Vector3.t;
-}
-
 type t = {
   program: ShaderProgram.t;
-  light: light
+  light: Light.t;
 }
 
-let init gl = {
+let init gl light = {
   program = ShaderProgram.init gl vertex_source fragment_source attribs;
-  light = {
-    position = Vector3.create 0. 0. 0.;
-    ambient = Vector3.create 1. 1. 1.;
-    diffuse = Vector3.create 1. 1. 1.;
-    specular = Vector3.create 1. 1. 1.;
-  }
+  light;
 }
-
-let set_light r position ambient diffuse specular =
-  {
-    r with
-    light = {
-      position;
-      ambient;
-      diffuse;
-      specular;
-    }
-  }
 
 let use { program; light } model_mat view_mat proj_mat =
-  ShaderProgram.use program;
   let normal_mat = Matrix4.multiply view_mat model_mat |> Matrix4.inverse |> Matrix4.transpose in
+  let light_pos = Matrix4.multiply_point view_mat (Light.position light) in
+
+  ShaderProgram.use program;
+
   ShaderProgram.bind_uniform_mat4 program "u_norm" normal_mat;
   ShaderProgram.bind_uniform_mat4 program "u_model" model_mat;
   ShaderProgram.bind_uniform_mat4 program "u_view" view_mat;
   ShaderProgram.bind_uniform_mat4 program "u_proj" proj_mat;
+
   ShaderProgram.bind_uniform_3f program "k_amb" (0.2, 0.05, 0.1);
   ShaderProgram.bind_uniform_3f program "k_dif" (0.8, 0.2, 0.4);
   ShaderProgram.bind_uniform_3f program "k_spec" (0.8, 0.8, 0.8);
   ShaderProgram.bind_uniform_f program "k_shine" 15.;
-  ShaderProgram.bind_uniform_3f program "light_pos" (Matrix4.multiply_vector view_mat light.position);
-  ShaderProgram.bind_uniform_3f program "light_amb" light.ambient;
-  ShaderProgram.bind_uniform_3f program "light_dif" light.diffuse;
-  ShaderProgram.bind_uniform_3f program "light_spec" light.specular
+
+  ShaderProgram.bind_uniform_3f
+    program
+    "light_pos"
+    (Point3.uniform_3 light_pos);
+  ShaderProgram.bind_uniform_3f
+    program
+    "light_amb"
+    (Color.uniform_3 (Light.ambient light));
+  ShaderProgram.bind_uniform_3f
+    program
+    "light_dif"
+    (Color.uniform_3 (Light.diffuse light));
+  ShaderProgram.bind_uniform_3f
+    program
+    "light_spec"
+    (Color.uniform_3 (Light.specular light))
 
 let draw r model model_mat view_mat proj_mat =
   use r model_mat view_mat proj_mat;

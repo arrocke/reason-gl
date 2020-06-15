@@ -1,9 +1,7 @@
-type frame_id
 type keyboard_event = {
   key: string
 }
 
-external request_frame : (float -> unit) -> frame_id = "requestAnimationFrame" [@@bs.val]
 external add_event_listener: string -> (keyboard_event -> unit) -> unit = "addEventListener" [@@bs.val] [@@bs.scope "window"]
 
 let gl = match GL.init () with
@@ -15,18 +13,15 @@ let canvas = GL.canvas(gl)
 let () = GL.enable gl GL.Constant.cull_face
 let () = GL.enable gl GL.Constant.depth_test
 
-let renderer = Renderer.init gl
-let renderer = Renderer.set_light
-  renderer
-  (Vector3.create 500. 500. 500.)
-  (Vector3.create 1.0 1.0 1.0)
-  (Vector3.create 1.0 1.0 1.0)
-  (Vector3.create 1.0 1.0 1.0)
+let light = Light.create (Point3.create 500. 500. 500.) (Color.create_rgb 1.0 1.0 1.0)
+
+let renderer = Renderer.init gl light
+
 let model = Model.load gl (Sphere.create 50 100)
 
 let scale len n = (mod_float n len) /. len
 
-let rec loop _ _ =
+let loop state t =
   (* Reset canvas. *)
   GL.clear_color gl 1.0 1.0 1.0 1.0;
   GL.clear gl (GL.Constant.color_buffer_bit lor GL.Constant.depth_buffer_bit);
@@ -48,9 +43,6 @@ let rec loop _ _ =
 
   Renderer.draw renderer model model_mat view_mat proj_mat;
 
-  (* Request next frame *)
-  let _ = request_frame (loop ()) in
+  state
 
-  ()
-
-let id = request_frame (loop ())
+let () = RenderLoop.start loop ()
