@@ -63,7 +63,7 @@ val delete_shader: shader -> unit
 val get_shader_parameter: shader -> Constant.t -> bool
 val get_shader_info_log: shader -> string
 
-val create_program: program
+val create_program: unit -> program
 val attach_shader: program -> shader -> unit
 val link_program: program -> unit
 val get_program_parameter: program -> Constant.t -> bool
@@ -82,6 +82,7 @@ val get_uniform_location: program -> string -> uniform
 val uniform_matrix_4fv: uniform -> bool -> Js.TypedArray2.Float32Array.t -> unit
 val uniform_4fv: uniform -> (float * float * float * float) -> unit
 val uniform_3fv: uniform -> (float * float * float) -> unit
+val uniform_2fv: uniform -> (float * float) -> unit
 val uniform_f: uniform -> float -> unit
 
 val create_buffer: unit -> buffer

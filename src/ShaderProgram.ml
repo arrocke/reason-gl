@@ -15,7 +15,7 @@ let init vertex_source fragment_source attribs =
     shader in
   let vertex_shader = compile_shader GL.Constant.vertex_shader vertex_source in
   let fragment_shader = compile_shader GL.Constant.fragment_shader fragment_source in
-  let program = GL.create_program in
+  let program = GL.create_program () in
   GL.attach_shader program vertex_shader;
   GL.attach_shader program fragment_shader;
   List.iter (fun (pos, name) -> GL.bind_attrib_location program pos name) attribs;
@@ -36,8 +36,6 @@ let init vertex_source fragment_source attribs =
 
 let use { program; } =
   GL.use_program program
-
-let stop { program; } = ()
 
 let bind_uniform_mat4 { program; } name mat =
   let location = GL.get_uniform_location program name in

@@ -107,7 +107,7 @@ let get_shader_info_log = get_shader_info_log gl
 
 
 external create_program: gl -> program = "createProgram" [@@bs.send]
-let create_program = create_program gl
+let create_program () = create_program gl
 
 external attach_shader: gl -> program -> shader -> unit = "attachShader" [@@bs.send]
 let attach_shader = attach_shader gl
@@ -158,6 +158,9 @@ let uniform_4fv = uniform_4fv gl
 
 external uniform_3fv: gl -> uniform -> (float * float * float) -> unit = "uniform3fv" [@@bs.send]
 let uniform_3fv = uniform_3fv gl
+
+external uniform_2fv: gl -> uniform -> (float * float) -> unit = "uniform2fv" [@@bs.send]
+let uniform_2fv = uniform_2fv gl
 
 external uniform_f: gl -> uniform -> float -> unit = "uniform1f" [@@bs.send]
 let uniform_f = uniform_f gl

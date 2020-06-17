@@ -106,4 +106,3 @@ let use { program; light } model_mat view_mat proj_mat =
 let draw r model model_mat view_mat proj_mat =
   use r model_mat view_mat proj_mat;
   Model.draw model;
-  ShaderProgram.stop r.program;
