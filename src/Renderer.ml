@@ -66,7 +66,7 @@ type t = {
 }
 
 let init gl light = {
-  program = ShaderProgram.init gl vertex_source fragment_source attribs;
+  program = ShaderProgram.init vertex_source fragment_source attribs;
   light;
 }
 
@@ -93,17 +93,17 @@ let use { program; light } model_mat view_mat proj_mat =
   ShaderProgram.bind_uniform_3f
     program
     "light_amb"
-    (Color.uniform_3 (Light.ambient light));
+    (Color.tuple_3 (Light.ambient light));
   ShaderProgram.bind_uniform_3f
     program
     "light_dif"
-    (Color.uniform_3 (Light.diffuse light));
+    (Color.tuple_3 (Light.diffuse light));
   ShaderProgram.bind_uniform_3f
     program
     "light_spec"
-    (Color.uniform_3 (Light.specular light))
+    (Color.tuple_3 (Light.specular light))
 
 let draw r model model_mat view_mat proj_mat =
   use r model_mat view_mat proj_mat;
-  Model.draw r.program.gl model;
+  Model.draw model;
   ShaderProgram.stop r.program;

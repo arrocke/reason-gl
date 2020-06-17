@@ -4,14 +4,10 @@ type keyboard_event = {
 
 external add_event_listener: string -> (keyboard_event -> unit) -> unit = "addEventListener" [@@bs.val] [@@bs.scope "window"]
 
-let gl = match GL.init () with
-| Some(gl) -> gl
-| None -> raise(Not_found)
+let gl = GL.gl
 
-let canvas = GL.canvas(gl)
-
-let () = GL.enable gl GL.Constant.cull_face
-let () = GL.enable gl GL.Constant.depth_test
+let () = GL.enable GL.Constant.cull_face
+let () = GL.enable GL.Constant.depth_test
 
 let light = Light.create (Point3.create 500. 500. 500.) (Color.create_rgb 1.0 1.0 1.0)
 
@@ -23,11 +19,11 @@ let scale len n = (mod_float n len) /. len
 
 let loop state t =
   (* Reset canvas. *)
-  GL.clear_color gl 1.0 1.0 1.0 1.0;
-  GL.clear gl (GL.Constant.color_buffer_bit lor GL.Constant.depth_buffer_bit);
-  let width = Canvas.width canvas in
-  let height = Canvas.height canvas in
-  GL.viewport gl 0.0 0.0 (width) (height);
+  GL.clear_color (Color.create_rgb 1.0 1.0 1.0);
+  GL.clear (GL.Constant.color_buffer_bit lor GL.Constant.depth_buffer_bit);
+  let width = Canvas.width GL.canvas in
+  let height = Canvas.height GL.canvas in
+  GL.viewport 0.0 0.0 width height;
 
   let aspect = width /. height in
   let proj_mat = Matrix4.perspective 1.0 aspect 1. 2000. in

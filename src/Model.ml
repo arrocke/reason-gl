@@ -53,36 +53,36 @@ let load gl model =
   
   let data_buffer = match model.data_buffer with
   | Some(buffer) -> buffer
-  | None -> GL.create_buffer gl in
-  GL.bind_buffer gl GL.Constant.array_buffer data_buffer;
-  GL.buffer_data_size gl GL.Constant.array_buffer totalSize GL.Constant.static_draw;
+  | None -> GL.create_buffer () in
+  GL.bind_buffer GL.Constant.array_buffer data_buffer;
+  GL.buffer_data_size GL.Constant.array_buffer totalSize GL.Constant.static_draw;
 
-  GL.buffer_sub_data gl GL.Constant.array_buffer verticesOffset (float_buffer_of_array model.vertices);
-  GL.enable_vertex_attrib_array gl 0;
-  GL.vertex_attrib_pointer gl 0 3 GL.Constant.float false 0 verticesOffset;
+  GL.buffer_sub_data GL.Constant.array_buffer verticesOffset (float_buffer_of_array model.vertices);
+  GL.enable_vertex_attrib_array 0;
+  GL.vertex_attrib_pointer 0 3 GL.Constant.float false 0 verticesOffset;
 
   let () = match Array.length model.normals with
-  | 0 -> GL.disable_vertex_attrib_array gl 1 
+  | 0 -> GL.disable_vertex_attrib_array 1 
   | _ -> 
-    GL.buffer_sub_data gl GL.Constant.array_buffer normalsOffset (float_buffer_of_array model.normals);
-    GL.enable_vertex_attrib_array gl 1;
-    GL.vertex_attrib_pointer gl 1 3 GL.Constant.float true 0 normalsOffset in
+    GL.buffer_sub_data GL.Constant.array_buffer normalsOffset (float_buffer_of_array model.normals);
+    GL.enable_vertex_attrib_array 1;
+    GL.vertex_attrib_pointer 1 3 GL.Constant.float true 0 normalsOffset in
 
   let () = match Array.length model.colors with
-  | 0 -> GL.disable_vertex_attrib_array gl 2 
+  | 0 -> GL.disable_vertex_attrib_array 2 
   | _ -> 
-    GL.buffer_sub_data gl GL.Constant.array_buffer colorsOffset (float_buffer_of_array model.colors);
-    GL.enable_vertex_attrib_array gl 2;
-    GL.vertex_attrib_pointer gl 2 3 GL.Constant.float true 0 colorsOffset in
+    GL.buffer_sub_data GL.Constant.array_buffer colorsOffset (float_buffer_of_array model.colors);
+    GL.enable_vertex_attrib_array 2;
+    GL.vertex_attrib_pointer 2 3 GL.Constant.float true 0 colorsOffset in
 
   let index_buffer = match Array.length model.normals with
   | 0 -> None
   | _ -> 
     let index_buffer = match model.data_buffer with
     | Some(buffer) -> buffer
-    | None -> GL.create_buffer gl in
-    GL.bind_buffer gl GL.Constant.element_array_buffer index_buffer;
-    GL.buffer_data gl GL.Constant.element_array_buffer (int_buffer_of_array model.indices) GL.Constant.static_draw;
+    | None -> GL.create_buffer () in
+    GL.bind_buffer GL.Constant.element_array_buffer index_buffer;
+    GL.buffer_data GL.Constant.element_array_buffer (int_buffer_of_array model.indices) GL.Constant.static_draw;
     Some(index_buffer) in
 
   {
@@ -92,9 +92,9 @@ let load gl model =
     loaded = true
   }
 
-let draw gl model =
-  GL.vertex_attrib_3f gl 1 0. 0. 0.;
-  GL.vertex_attrib_3f gl 2 1. 1. 1.;
+let draw model =
+  GL.vertex_attrib_3f 1 0. 0. 0.;
+  GL.vertex_attrib_3f 2 1. 1. 1.;
   match Array.length model.indices with
-  | 0 -> GL.draw_arrays gl GL.Constant.triangles 0 (Array.length model.vertices)
-  | _ -> GL.draw_elements gl GL.Constant.triangles (Array.length model.indices) GL.Constant.ushort 0
+  | 0 -> GL.draw_arrays GL.Constant.triangles 0 (Array.length model.vertices)
+  | _ -> GL.draw_elements GL.Constant.triangles (Array.length model.indices) GL.Constant.ushort 0
